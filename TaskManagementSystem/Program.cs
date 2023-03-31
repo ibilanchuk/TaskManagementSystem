@@ -3,12 +3,16 @@
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using TaskManagementSystem;
+using TaskManagementSystem.Application.UpdateTask;
+using TaskManagementSystem.Infrastructure.Messaging;
 using Task = TaskManagementSystem.Domain.Task;
 using TaskStatus = TaskManagementSystem.Domain.TaskStatus;
 
 var services = new ServiceCollection();
 var startup = new Startup();
 startup.ConfigureServices(services);
+
+var serviceBus = services.BuildServiceProvider().GetRequiredService<IServiceBus>();
 
 var option = 0;
 
@@ -91,6 +95,7 @@ async System.Threading.Tasks.Task UpdateTaskAsync()
     Console.Write("Enter who updated the status: ");
     var updatedBy = Console.ReadLine();
     
+    await serviceBus.SendMessageAsync(new UpdateTask(taskId, status, updatedBy));
     Console.WriteLine($"Command to update task with id: {taskId} was sent successfully");
 }
 
