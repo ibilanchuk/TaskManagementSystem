@@ -1,6 +1,8 @@
+using TaskManagementSystem.Application.Abstractions;
+
 namespace TaskManagementSystem.Application.UpdateTask;
 
-public class UpdateTask
+public class UpdateTask : AsyncCommand
 {
     public UpdateTask(
         int taskId,
