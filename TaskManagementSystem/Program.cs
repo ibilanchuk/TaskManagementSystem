@@ -15,7 +15,6 @@ startup.ConfigureServices(services);
 
 var serviceProvider = services.BuildServiceProvider();
 var serviceBus = serviceProvider.GetRequiredService<IServiceBus>();
-var taskRepository = serviceProvider.GetRequiredService<ITaskRepository>();
 
 var option = 0;
 
@@ -30,17 +29,20 @@ while (option != 4)
     Console.Write("Enter your choice: ");
     option = int.Parse(Console.ReadLine() ?? string.Empty);
 
+    using var scope = serviceProvider.CreateScope();
+    var taskRepository = scope.ServiceProvider.GetRequiredService<ITaskRepository>();
+    
     switch (option)
     {
         case 1:
-            await CreateTaskAsync();
+            await CreateTaskAsync(taskRepository);
             break;
         case 2:
             await UpdateTaskAsync();
             Console.WriteLine("Task updated successfully.");
             break;
         case 3:
-            foreach (var task in await GetTasksAsync())
+            foreach (var task in await GetTasksAsync(taskRepository))
             {
                 Console.WriteLine($"Existing tasks: {JsonSerializer.Serialize(task)}");
             }
@@ -58,7 +60,7 @@ while (option != 4)
     Console.ReadKey();
 }
 
-async System.Threading.Tasks.Task CreateTaskAsync()
+async System.Threading.Tasks.Task CreateTaskAsync(ITaskRepository taskRepository)
 {
     Console.Clear();
     Console.WriteLine("Create a new task");
@@ -100,7 +102,7 @@ async System.Threading.Tasks.Task UpdateTaskAsync()
     Console.WriteLine($"Command to update task with id: {taskId} was sent successfully");
 }
 
-async Task<IEnumerable<Task>> GetTasksAsync()
+async Task<IEnumerable<Task>> GetTasksAsync(ITaskRepository taskRepository)
 {
     return await taskRepository.GetAllAsync();
 }
