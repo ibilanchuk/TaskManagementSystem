@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TaskManagementSystem.Domain;
 using Task = System.Threading.Tasks.Task;
+using TaskStatus = TaskManagementSystem.Domain.TaskStatus;
 
 namespace TaskManagementSystem.Infrastructure.Persistence;
 
@@ -27,16 +28,16 @@ public class TaskRepository : ITaskRepository
 
     public async Task UpdateStatusAsync(int taskId, Domain.TaskStatus status, CancellationToken cancellationToken = default)
     {
-        var task = await _dbContext.Tasks.FirstOrDefaultAsync(x => x.Id == taskId, cancellationToken: cancellationToken);
-
-        if (task is null)
-        {
-            throw new ArgumentException($"Could not find task with id: {taskId}");
-        }
+        var task = await _dbContext.Tasks.FirstAsync(x => x.Id == taskId, cancellationToken: cancellationToken);
         
         task.SetStatus(status);
         
         _dbContext.Update(task);
         await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public Task<Domain.Task?> FindByIdAsync(int taskId, CancellationToken cancellationToken = default)
+    {
+        return _dbContext.Tasks.FirstOrDefaultAsync(x => x.Id == taskId, cancellationToken: cancellationToken);
     }
 }
