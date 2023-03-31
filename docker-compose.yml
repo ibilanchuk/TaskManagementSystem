@@ -1,13 +1,6 @@
 version: '3.9'
 
 services:
-  app:
-    build: .
-    depends_on:
-      - rabbitmq
-    stdin_open: true
-    tty: true
-  
   rabbitmq:
     image: rabbitmq:3-management-alpine
     ports:
@@ -17,3 +10,17 @@ services:
       RABBITMQ_DEFAULT_USER: 'guest'
       RABBITMQ_DEFAULT_PASS: 'guest'
 
+  mssql:
+    image: mcr.microsoft.com/azure-sql-edge
+    ports:
+      - '1433:1433'
+    environment:
+      SA_PASSWORD: 'P@ssw0rd!'
+      ACCEPT_EULA: 'Y'
+      MSSQL_USER: 'SA'
+      MSSQL_PID: 'Developer'
+    volumes:
+      - 'mssql_data:/var/opt/mssql'
+
+volumes:
+  mssql_data:

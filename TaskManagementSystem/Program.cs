@@ -4,6 +4,7 @@ using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using TaskManagementSystem;
 using TaskManagementSystem.Application.UpdateTask;
+using TaskManagementSystem.Domain;
 using TaskManagementSystem.Infrastructure.Messaging;
 using Task = TaskManagementSystem.Domain.Task;
 using TaskStatus = TaskManagementSystem.Domain.TaskStatus;
@@ -12,11 +13,11 @@ var services = new ServiceCollection();
 var startup = new Startup();
 startup.ConfigureServices(services);
 
-var serviceBus = services.BuildServiceProvider().GetRequiredService<IServiceBus>();
+var serviceProvider = services.BuildServiceProvider();
+var serviceBus = serviceProvider.GetRequiredService<IServiceBus>();
+var taskRepository = serviceProvider.GetRequiredService<ITaskRepository>();
 
 var option = 0;
-
-var tasks = new List<Task>();
 
 while (option != 4)
 {
@@ -70,8 +71,8 @@ async System.Threading.Tasks.Task CreateTaskAsync()
     var description = Console.ReadLine() ?? string.Empty;
 
     var task = new Task(name, description, TaskStatus.NotStarted);
-   
-    tasks.Add(task);
+    await taskRepository.AddAsync(task);
+  
     Console.WriteLine($"Task {JsonSerializer.Serialize(task)} created successfully.");
 }
 
@@ -101,5 +102,5 @@ async System.Threading.Tasks.Task UpdateTaskAsync()
 
 async Task<IEnumerable<Task>> GetTasksAsync()
 {
-    return tasks;
+    return await taskRepository.GetAllAsync();
 }

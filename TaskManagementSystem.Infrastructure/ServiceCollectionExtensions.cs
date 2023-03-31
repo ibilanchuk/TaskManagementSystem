@@ -1,16 +1,29 @@
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using TaskManagementSystem.Application.Abstractions;
 using TaskManagementSystem.Application.UpdateTask;
+using TaskManagementSystem.Domain;
 using TaskManagementSystem.Infrastructure.Messaging;
 using TaskManagementSystem.Infrastructure.Messaging.RabbitMQ;
+using TaskManagementSystem.Infrastructure.Persistence;
+
 namespace TaskManagementSystem.Infrastructure;
 
 public static class ServiceCollectionExtensions
 {
+    public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddDbContext<TaskDbContext>(options =>
+            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
+        services.AddScoped<ITaskRepository, TaskRepository>();
+        return services;
+    }
+    
     public static IServiceCollection AddMessaging(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<RabbitMqOptions>(configuration.GetSection(RabbitMqOptions.SectionName));

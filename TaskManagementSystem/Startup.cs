@@ -13,6 +13,7 @@ public class Startup
         
         services.AddApplicationLayer();
         services.AddMessaging(configuration);
+        services.AddPersistence(configuration);
     }
 
     private static IConfigurationRoot BuildConfiguration(IServiceCollection services)
