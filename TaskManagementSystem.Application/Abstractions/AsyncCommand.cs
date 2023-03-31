@@ -1,6 +1,8 @@
+using MediatR;
+
 namespace TaskManagementSystem.Application.Abstractions;
 
-public class AsyncCommand
+public class AsyncCommand : IRequest<Unit>
 {
     
 }
