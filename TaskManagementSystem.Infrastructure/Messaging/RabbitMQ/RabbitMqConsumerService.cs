@@ -53,7 +53,7 @@ public class RabbitMqConsumerService : BackgroundService
             var consumer = new EventingBasicConsumer(channel);
             consumer.Received += async (model, ea) =>
                 await _retryPolicy.ExecuteAsync(async () => {
-                    await HandleMessage(stoppingToken, ea, channel);
+                    await HandleMessage(ea, channel, stoppingToken);
                 });
 
             channel.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
@@ -62,7 +62,7 @@ public class RabbitMqConsumerService : BackgroundService
         return Task.CompletedTask;
     }
 
-    private async Task HandleMessage(CancellationToken stoppingToken, BasicDeliverEventArgs ea, IModel? channel)
+    private async Task HandleMessage(BasicDeliverEventArgs ea, IModel? channel, CancellationToken stoppingToken)
     {
         try
         {
