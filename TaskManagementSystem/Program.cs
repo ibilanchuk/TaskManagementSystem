@@ -1,9 +1,14 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System.Text.Json;
-
+using Microsoft.Extensions.DependencyInjection;
+using TaskManagementSystem;
 using Task = TaskManagementSystem.Domain.Task;
 using TaskStatus = TaskManagementSystem.Domain.TaskStatus;
+
+var services = new ServiceCollection();
+var startup = new Startup();
+startup.ConfigureServices(services);
 
 var option = 0;
 
