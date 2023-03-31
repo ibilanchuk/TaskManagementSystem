@@ -1,4 +1,5 @@
 using TaskManagementSystem.Application;
+using TaskManagementSystem.Infrastructure;
 using TaskManagementSystem.Infrastructure.Messaging.RabbitMQ;
 
 static IConfigurationRoot BuildConfiguration(IServiceCollection services)
@@ -19,6 +20,7 @@ IHost host = Host.CreateDefaultBuilder(args)
        
         services.Configure<RabbitMqOptions>(configuration.GetSection(RabbitMqOptions.SectionName));
         services.AddApplicationLayer();
+        services.AddPersistence(configuration);
         services.AddHostedService<RabbitMqConsumerService>();
     })
     .Build();
